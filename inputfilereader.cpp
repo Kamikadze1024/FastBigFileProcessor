@@ -5,7 +5,11 @@
 namespace FileReader {
 
 InputFileReader::InputFileReader(std::shared_ptr<std::map<std::string, double>>
-                                 summs) : m_summs(summs) { }
+                                 summs,
+                                 std::shared_ptr<
+                                 Containers::ThreadsafeQueue<std::string>
+                                 > strs)
+    : m_summs(summs), m_readStrs(strs) { }
 
 //прочитать входной файл
 void InputFileReader::readInputFile() {
@@ -51,7 +55,9 @@ void InputFileReader::readInputFile() {
                 //если встретил конец строки, перешел на следующую строку
                 if(*(pStartPoint + j) == '\n') {
                     std::string res = arr;
-                    std::cout << res;
+
+                    //опускаю строку в очередь
+                    m_readStrs->push(res);
 
                     /*
                      * Временно, паршу json прямо здесь

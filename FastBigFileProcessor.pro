@@ -10,4 +10,5 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    inputfilereader.hpp
+    inputfilereader.hpp \
+    threadsafequeue.hpp

@@ -18,6 +18,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
 #include <map>
+#include "threadsafequeue.hpp"
 
 namespace FileReader {
 
@@ -63,6 +64,9 @@ private:
     //контейнер для сумм расстояний по направлениям
     std::shared_ptr<std::map<std::string, double>> m_summs;
 
+    //контейнер для прочитанных из файла строк
+    std::shared_ptr<Containers::ThreadsafeQueue<std::string>> m_readStrs;
+
     /*
      * Временно, в этом классе, будет парсинг json.
      */
@@ -72,7 +76,8 @@ private:
     std::string getFieldValue(boost::property_tree::ptree const& pt,
                   std::string field);
 public:
-    InputFileReader(std::shared_ptr<std::map<std::string, double>>);
+    InputFileReader(std::shared_ptr<std::map<std::string, double>>,
+                    std::shared_ptr<Containers::ThreadsafeQueue<std::string>>);
 
     /*
      * Прочитать входной файл.

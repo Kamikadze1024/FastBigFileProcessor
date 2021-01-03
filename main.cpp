@@ -5,6 +5,9 @@
 using namespace std;
 
 int main() {
+    //умный указатель на потокобезопасную очередь строк
+    std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings;
+
     //умный указатель на контейнер с суммами по-направлениям
     std::shared_ptr<std::map<std::string, double>> summs;
     summs.reset(new std::map<std::string, double>);
@@ -15,7 +18,7 @@ int main() {
 
     //Однопоточная программа
     std::unique_ptr<FileReader::InputFileReader> ifr;
-    ifr.reset(new FileReader::InputFileReader(summs));
+    ifr.reset(new FileReader::InputFileReader(summs, strings));
 
     try {
         ifr->readInputFile();
