@@ -6,4 +6,8 @@ CONFIG -= qt
 LIBS += -lboost_system -lboost_filesystem -lboost_iostreams
 
 SOURCES += \
+        inputfilereader.cpp \
         main.cpp
+
+HEADERS += \
+    inputfilereader.hpp

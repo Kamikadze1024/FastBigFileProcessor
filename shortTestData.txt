@@ -1,0 +1,10 @@
+{"timestamp":"1583020800577000000","direction":"-1","speed":"21.15", "time":0.7023}
+{"timestamp":"1583020800577000000","direction":"-1","speed":"16.28", "time":0.3653}
+{"timestamp":"1583020800577000000","direction":"-1","speed":"42.18", "time":0.1135}
+{"timestamp":"1583020800577000000","direction":"-1","speed":"19.38", "time":0.7214}
+{"timestamp":"1583020800577000000","direction":"-1","speed":"77.13", "time":0.8327}
+{"timestamp":"1583020800577000000","direction":"1","speed":"8.28", "time":0.6113}
+{"timestamp":"1583020800577000000","direction":"1","speed":"3.15", "time":0.8726}
+{"timestamp":"1583020800577000000","direction":"1","speed":"6.00", "time":0.9432}
+{"timestamp":"1583020800577000000","direction":"1","speed":"98.20", "time":0.1698}
+{"timestamp":"1583020800577000000","direction":"1","speed":"100.00", "time":0.2463}
