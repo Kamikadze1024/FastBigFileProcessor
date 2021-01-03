@@ -1,5 +1,6 @@
 #include "inputfilereader.hpp"
 #include <iostream>
+#include <sstream>
 
 namespace FileReader {
 
@@ -52,6 +53,17 @@ void InputFileReader::readInputFile() {
                 if(*(pStartPoint + j) == '\n') {
                     std::string res = arr;
                     std::cout << res;
+
+                    /*
+                     * Временно, паршу json прямо здесь
+                     */
+                    try {
+                        parseJson(res);
+                    }  catch (JsonParsingException &e) {
+                        throw FileReaderException(e.what());
+                    }
+
+
                     strCntr = 0;
                     memset(arr, 0, CONST_ARR_SZ);
                     break;
@@ -71,6 +83,39 @@ void InputFileReader::readInputFile() {
         std::string excMsg = "Файл не открыт";
         throw FileReaderException(excMsg);
     }
+}
+
+std::string InputFileReader::getFieldValue(boost::property_tree::ptree const& pt,
+                                      std::string field) {
+    boost::property_tree::ptree::const_iterator end = pt.end();
+    boost::property_tree::ptree::const_iterator it;
+
+    std::string res;
+    for(it = pt.begin(); it != end; ++it) {
+        if(it->first.compare(field) == 0) {
+            res = it->second.get_value<std::string>();
+            break;
+        }
+    }
+
+    return res;
+}
+
+void InputFileReader::parseJson(std::string jsonMsg) {
+    std::istringstream iss(jsonMsg);
+    boost::property_tree::ptree pt;
+    boost::property_tree::read_json(iss, pt);
+
+    if(pt.empty()) {
+        std::string excMsg = "Дерево свойств пусто";
+        throw JsonParsingException(excMsg);
+    }
+
+    std::string speed = getFieldValue(pt, "speed");
+    std::string time  = getFieldValue(pt, "time");
+    std::string direction = getFieldValue(pt, "direction");
+
+    int i = 0;
 }
 
 }

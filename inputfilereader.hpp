@@ -14,9 +14,24 @@
 
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <iostream>
 
 namespace FileReader {
+
+//исключение парсинга json
+class JsonParsingException final {
+private:
+    //сообщение об ошибке
+    std::string m_msg;
+
+public:
+    JsonParsingException(std::string msg) : m_msg(msg) {};
+
+    //возвратить сообщение об ошибке
+    std::string what() { return m_msg; }
+};
 
 //исключение читальщика
 class FileReaderException final {
@@ -43,6 +58,15 @@ private:
 
     //мап файла
     BiosMfs m_f;
+
+    /*
+     * Временно, в этом классе, будет парсинг json.
+     */
+    void parseJson(std::string jsonMsg);
+
+    //получить значение поля
+    std::string getFieldValue(boost::property_tree::ptree const& pt,
+                  std::string field);
 public:
     InputFileReader();
 
