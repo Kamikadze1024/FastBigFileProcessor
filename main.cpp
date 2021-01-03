@@ -4,6 +4,8 @@
 
 using namespace std;
 
+static const int CONST_BLK_SZ = 70; //размер считываемого блока в байтах
+
 int main() {
 
     //проверяю путь на доступность
@@ -28,19 +30,33 @@ int main() {
     memset(arr, 0, 256);
 
     if(f.is_open()) {
+        std::cout << "File   size = " << size << std::endl;
+        std::cout << "Mapped size = " << f.size() << std::endl;
+
         //счетчик позиции байта в конкретной строке
         std::size_t strCntr = 0;
         for(boost::uintmax_t i = 0; i < size; i++) {
-            arr[strCntr] = *(pStartPoint + i);
-            //если встретил конец строки, перешел на следующую строку
-            if(*(pStartPoint + i) == '\n') {
-                std::string res = arr;
-                std::cout << res;
-                strCntr = 0;
-                memset(arr, 0, 256);
-                continue;
+
+            //считываю блок
+            memcpy(arr, (pStartPoint + i), CONST_BLK_SZ);
+            i += CONST_BLK_SZ;
+            strCntr += CONST_BLK_SZ;
+
+            //дочитываю до конца строки
+            for(boost::uintmax_t j = i; j < size; j++) {
+                arr[strCntr] = *(pStartPoint + j);
+
+                //если встретил конец строки, перешел на следующую строку
+                if(*(pStartPoint + j) == '\n') {
+                    std::string res = arr;
+                    std::cout << res;
+                    strCntr = 0;
+                    memset(arr, 0, 256);
+                    break;
+                }
+                strCntr++;
+                i = j;
             }
-            strCntr++;
         }
 
         //размапливаю файл
