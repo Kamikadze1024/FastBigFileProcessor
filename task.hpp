@@ -14,6 +14,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <map>
+#include <atomic>
+#include "threadsafequeue.hpp"
 
 namespace Task {
 
@@ -32,8 +34,14 @@ public:
 
 class Task {
 private:
+    //флаг работы
+    std::atomic<bool>                                        m_flag;
+
     //контейнер для сумм расстояний по направлениям
-    std::shared_ptr<std::map<std::string, double>> m_summs;
+    std::shared_ptr<std::map<std::string, double>>           m_summs;
+
+    //потокобезопасная очередь
+    std::shared_ptr<Containers::ThreadsafeQueue<std::string>> m_strings;
 
     //распарсить json
     void parseJson(std::string jsonMsg);
@@ -42,7 +50,11 @@ private:
     std::string getFieldValue(boost::property_tree::ptree const& pt,
                   std::string field);
 public:
-    Task();
+    Task(std::shared_ptr<std::map<std::string, double>>,
+         std::shared_ptr<Containers::ThreadsafeQueue<std::string>>);
+
+    //обработать все заявки
+    void processAllTasks();
 };
 
 }

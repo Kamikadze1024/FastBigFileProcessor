@@ -3,8 +3,29 @@
 #include <thread>
 #include <future>
 #include "inputfilereader.hpp"
+#include "task.hpp"
 
 using namespace std;
+
+//поток чтения входного файла
+void readerThdFunc(std::shared_ptr<FileReader::InputFileReader> reader) {
+    try {
+        reader->readInputFile();
+    } catch (FileReader::FileReaderException &e) {
+        std::cout << e.what() << std::endl;
+        return;
+    }
+}
+
+//поток парсинга и подсчета расстояния
+void parserThdFunc(std::shared_ptr<Task::Task> task) {
+    try {
+        task->processAllTasks();
+    } catch (Task::JsonParsingException &e) {
+        std::cout << e.what() << std::endl;
+        return;
+    }
+}
 
 int main() {
     //умный указатель на потокобезопасную очередь строк
@@ -21,18 +42,22 @@ int main() {
 
     //инициализирую объект читателя
     //"Читатель" строк
-    std::unique_ptr<FileReader::InputFileReader> ifr;
+    std::shared_ptr<FileReader::InputFileReader> ifr;
     ifr.reset(new FileReader::InputFileReader(strings));
 
+    //инициализирую объект - обработчик задач
+    std::shared_ptr<Task::Task> taskProc;
+    taskProc.reset(new Task::Task(summs, strings));
+
     //читаю входной файл
-    auto futRead = std::async(std::launch::async,
-                              &FileReader::InputFileReader::readInputFile,
-                              ifr.get());
-    try {
-        futRead.get();
-    } catch (FileReader::FileReaderException &e) {
-        std::cout << e.what() << std::endl;
-    }
+    std::thread readerThread(readerThdFunc, ifr);
+    std::thread parserThread(parserThdFunc, taskProc);
+
+    //дождаться окончания чтения
+    readerThread.join();
+    //дождаться окончания парсинга
+    parserThread.join();
+
 
     std::cout << "========= Результат работы ========" << std::endl;
     std::cout << "Сумма расстояний направления 1 = "
