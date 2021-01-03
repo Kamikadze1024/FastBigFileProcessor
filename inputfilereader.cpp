@@ -10,29 +10,32 @@ InputFileReader::InputFileReader() {
 //прочитать входной файл
 void InputFileReader::readInputFile() {
     //проверяю путь на доступность
-    boost::filesystem::path p("shortTestData.txt");
+    BfsPath p("shortTestData.txt");
     if(!boost::filesystem::exists(p)) {
-        std::cout << "Файл shortTestData.txt недоступен" << std::endl;
-        return;
+        throw FileReaderException("Файл shortTestData.txt недоступен");
     }
 
     //получаю размер файла в байтах
     boost::uintmax_t size = boost::filesystem::file_size(p);
 
-    //TODO: мап и файл одинакового размера???
-
-    boost::iostreams::mapped_file_source f;
     //маплю файл
-    f.open(p);
+    m_f.open(p);
 
     //указатель на начало смапленного файла
-    const char *pStartPoint = static_cast<const char *>(f.data());
-    char arr[256];
-    memset(arr, 0, 256);
+    const char *pStartPoint = static_cast<const char *>(m_f.data());
 
-    if(f.is_open()) {
-        std::cout << "File   size = " << size << std::endl;
-        std::cout << "Mapped size = " << f.size() << std::endl;
+    //массив, в который буду читать байты
+    char arr[CONST_ARR_SZ];
+    //очищаю массив
+    memset(arr, 0, CONST_ARR_SZ);
+
+    if(m_f.is_open()) {
+        //размер файла не равен размеру мапа
+        if(size != m_f.size()) {
+            m_f.close();
+            std::string excStr = "Размер мапа не равен размеру файла";
+            throw FileReaderException(excStr);
+        }
 
         //счетчик позиции байта в конкретной строке
         std::size_t strCntr = 0;
@@ -45,25 +48,28 @@ void InputFileReader::readInputFile() {
 
             //дочитываю до конца строки
             for(boost::uintmax_t j = i; j < size; j++) {
-                arr[strCntr] = *(pStartPoint + j);
-
                 //если встретил конец строки, перешел на следующую строку
                 if(*(pStartPoint + j) == '\n') {
                     std::string res = arr;
                     std::cout << res;
                     strCntr = 0;
-                    memset(arr, 0, 256);
+                    memset(arr, 0, CONST_ARR_SZ);
                     break;
                 }
+
+                arr[strCntr] = *(pStartPoint + j);
                 strCntr++;
                 i = j;
             }
         }
 
+        std::cout << std::endl;
+
         //размапливаю файл
-        f.close();
+        m_f.close();
     } else {
-        std::cout << "Файл не открыт" << std::endl;
+        std::string excMsg = "Файл не открыт";
+        throw FileReaderException(excMsg);
     }
 }
 
