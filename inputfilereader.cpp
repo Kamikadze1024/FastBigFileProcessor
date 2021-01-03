@@ -4,9 +4,8 @@
 
 namespace FileReader {
 
-InputFileReader::InputFileReader() {
-
-}
+InputFileReader::InputFileReader(std::shared_ptr<std::map<std::string, double>>
+                                 summs) : m_summs(summs) { }
 
 //прочитать входной файл
 void InputFileReader::readInputFile() {
@@ -112,10 +111,17 @@ void InputFileReader::parseJson(std::string jsonMsg) {
     }
 
     std::string speed = getFieldValue(pt, "speed");
+    double dSpeed     = std::stod(speed);
+
     std::string time  = getFieldValue(pt, "time");
+    double dTime      = std::stod(time);
+
+    double distance = dSpeed * dTime;
+
     std::string direction = getFieldValue(pt, "direction");
 
-    int i = 0;
+    m_summs.get()->at(direction) = m_summs.get()->at(direction)
+            + distance;
 }
 
 }

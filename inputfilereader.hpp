@@ -17,6 +17,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
+#include <map>
 
 namespace FileReader {
 
@@ -59,6 +60,9 @@ private:
     //мап файла
     BiosMfs m_f;
 
+    //контейнер для сумм расстояний по направлениям
+    std::shared_ptr<std::map<std::string, double>> m_summs;
+
     /*
      * Временно, в этом классе, будет парсинг json.
      */
@@ -68,7 +72,7 @@ private:
     std::string getFieldValue(boost::property_tree::ptree const& pt,
                   std::string field);
 public:
-    InputFileReader();
+    InputFileReader(std::shared_ptr<std::map<std::string, double>>);
 
     /*
      * Прочитать входной файл.
