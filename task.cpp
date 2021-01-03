@@ -5,7 +5,10 @@ namespace Task {
 
 Task::Task(std::shared_ptr<std::map<std::string, double>> summs,
            std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings)
-    : m_summs(summs), m_strings(strings) { m_flag.store(true); }
+    : m_summs(summs), m_strings(strings) {
+    m_flag.store(true);
+    m_flagCanStop.store(false);
+}
 
 std::string Task::getFieldValue(boost::property_tree::ptree const& pt,
                                       std::string field) {
@@ -47,6 +50,11 @@ void Task::parseJson(std::string jsonMsg) {
             + distance;
 }
 
+//указать этому потоку, что может завершаться
+void Task::canStop() {
+    m_flagCanStop.store(true);
+}
+
 void Task::processAllTasks() {
     while(m_flag.load()) {
         while(!m_strings->empty()) {
@@ -58,6 +66,10 @@ void Task::processAllTasks() {
             }  catch (JsonParsingException &e) {
                 throw;
             }
+        }
+
+        if(m_flagCanStop.load()) {
+            m_flag.store(false);
         }
     }
 }

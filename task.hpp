@@ -37,6 +37,9 @@ private:
     //флаг работы
     std::atomic<bool>                                        m_flag;
 
+    //флаг необходимости остановиться
+    std::atomic<bool>                                        m_flagCanStop;
+
     //контейнер для сумм расстояний по направлениям
     std::shared_ptr<std::map<std::string, double>>           m_summs;
 
@@ -55,6 +58,9 @@ public:
 
     //обработать все заявки
     void processAllTasks();
+
+    //указать этому потоку, что может завершаться
+    void canStop();
 };
 
 }
