@@ -14,26 +14,11 @@
 
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include <iostream>
 #include <map>
 #include "threadsafequeue.hpp"
 
 namespace FileReader {
-
-//исключение парсинга json
-class JsonParsingException final {
-private:
-    //сообщение об ошибке
-    std::string m_msg;
-
-public:
-    JsonParsingException(std::string msg) : m_msg(msg) {};
-
-    //возвратить сообщение об ошибке
-    std::string what() { return m_msg; }
-};
 
 //исключение читальщика
 class FileReaderException final {
@@ -51,7 +36,7 @@ public:
 class InputFileReader final {
 private:
     //константы
-    static const int CONST_BLK_SZ = 70; //размер считываемого блока в байтах
+    static const int CONST_BLK_SZ = 60; //размер считываемого блока в байтах
     static const int CONST_ARR_SZ = 100; //размер массива
 
     //псевдонимы
@@ -61,23 +46,11 @@ private:
     //мап файла
     BiosMfs m_f;
 
-    //контейнер для сумм расстояний по направлениям
-    std::shared_ptr<std::map<std::string, double>> m_summs;
-
     //контейнер для прочитанных из файла строк
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> m_readStrs;
 
-    /*
-     * Временно, в этом классе, будет парсинг json.
-     */
-    void parseJson(std::string jsonMsg);
-
-    //получить значение поля
-    std::string getFieldValue(boost::property_tree::ptree const& pt,
-                  std::string field);
 public:
-    InputFileReader(std::shared_ptr<std::map<std::string, double>>,
-                    std::shared_ptr<Containers::ThreadsafeQueue<std::string>>);
+    InputFileReader(std::shared_ptr<Containers::ThreadsafeQueue<std::string>>);
 
     /*
      * Прочитать входной файл.

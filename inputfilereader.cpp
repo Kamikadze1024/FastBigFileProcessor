@@ -1,15 +1,12 @@
 #include "inputfilereader.hpp"
 #include <iostream>
-#include <sstream>
 
 namespace FileReader {
 
-InputFileReader::InputFileReader(std::shared_ptr<std::map<std::string, double>>
-                                 summs,
-                                 std::shared_ptr<
+InputFileReader::InputFileReader(std::shared_ptr<
                                  Containers::ThreadsafeQueue<std::string>
                                  > strs)
-    : m_summs(summs), m_readStrs(strs) { }
+    : m_readStrs(strs) { }
 
 //прочитать входной файл
 void InputFileReader::readInputFile() {
@@ -55,19 +52,18 @@ void InputFileReader::readInputFile() {
                 //если встретил конец строки, перешел на следующую строку
                 if(*(pStartPoint + j) == '\n') {
                     std::string res = arr;
-
+                    std::cout << res << std::endl;
                     //опускаю строку в очередь
                     m_readStrs->push(res);
 
                     /*
                      * Временно, паршу json прямо здесь
                      */
-                    try {
+                    /*try {
                         parseJson(res);
                     }  catch (JsonParsingException &e) {
                         throw FileReaderException(e.what());
-                    }
-
+                    }*/
 
                     strCntr = 0;
                     memset(arr, 0, CONST_ARR_SZ);
@@ -88,46 +84,6 @@ void InputFileReader::readInputFile() {
         std::string excMsg = "Файл не открыт";
         throw FileReaderException(excMsg);
     }
-}
-
-std::string InputFileReader::getFieldValue(boost::property_tree::ptree const& pt,
-                                      std::string field) {
-    boost::property_tree::ptree::const_iterator end = pt.end();
-    boost::property_tree::ptree::const_iterator it;
-
-    std::string res;
-    for(it = pt.begin(); it != end; ++it) {
-        if(it->first.compare(field) == 0) {
-            res = it->second.get_value<std::string>();
-            break;
-        }
-    }
-
-    return res;
-}
-
-void InputFileReader::parseJson(std::string jsonMsg) {
-    std::istringstream iss(jsonMsg);
-    boost::property_tree::ptree pt;
-    boost::property_tree::read_json(iss, pt);
-
-    if(pt.empty()) {
-        std::string excMsg = "Дерево свойств пусто";
-        throw JsonParsingException(excMsg);
-    }
-
-    std::string speed = getFieldValue(pt, "speed");
-    double dSpeed     = std::stod(speed);
-
-    std::string time  = getFieldValue(pt, "time");
-    double dTime      = std::stod(time);
-
-    double distance = dSpeed * dTime;
-
-    std::string direction = getFieldValue(pt, "direction");
-
-    m_summs.get()->at(direction) = m_summs.get()->at(direction)
-            + distance;
 }
 
 }
