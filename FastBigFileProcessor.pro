@@ -13,4 +13,5 @@ SOURCES += \
 HEADERS += \
     inputfilereader.hpp \
     task.hpp \
+    threadpool.hpp \
     threadsafequeue.hpp

@@ -4,6 +4,7 @@
 #include <future>
 #include "inputfilereader.hpp"
 #include "task.hpp"
+#include "threadpool.hpp"
 
 using namespace std;
 
@@ -27,7 +28,26 @@ void parserThdFunc(std::shared_ptr<Task::Task> task) {
     }
 }
 
+class A final {
+private:
+    std::string m_val;
+public:
+    A() { m_val = "Тестовый класс"; }
+    ~A() {}
+
+    void work() {
+        std::cout << m_val << std::endl;
+    }
+};
+
 int main() {
+
+    //вот так можно забиндить в обертку метод объекта класса
+    A aFoo;
+    ThPool::FunctionWrapper fw(std::bind(&A::work, &aFoo));
+    fw();
+
+    return 0;
     //умный указатель на потокобезопасную очередь строк
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings;
     strings.reset(new Containers::ThreadsafeQueue<std::string>);
