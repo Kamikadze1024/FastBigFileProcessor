@@ -5,8 +5,8 @@ namespace FileReader {
 
 InputFileReader::InputFileReader(std::shared_ptr<
                                  Containers::ThreadsafeQueue<std::string>
-                                 > strs)
-    : m_readStrs(strs) { }
+                                 > strs, std::atomic<bool> &readComplete)
+    : m_readStrs(strs), m_readComplete(readComplete) { }
 
 //прочитать входной файл
 void InputFileReader::readInputFile() {
@@ -56,15 +56,6 @@ void InputFileReader::readInputFile() {
                     //опускаю строку в очередь
                     m_readStrs->push(res);
 
-                    /*
-                     * Временно, паршу json прямо здесь
-                     */
-                    /*try {
-                        parseJson(res);
-                    }  catch (JsonParsingException &e) {
-                        throw FileReaderException(e.what());
-                    }*/
-
                     strCntr = 0;
                     memset(arr, 0, CONST_ARR_SZ);
                     break;
@@ -80,6 +71,9 @@ void InputFileReader::readInputFile() {
 
         //размапливаю файл
         m_f.close();
+
+        //чтение закончил, сообщаю об этом другим потокам
+        m_readComplete.store(true);
     } else {
         std::string excMsg = "Файл не открыт";
         throw FileReaderException(excMsg);

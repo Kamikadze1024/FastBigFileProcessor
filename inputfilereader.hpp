@@ -16,6 +16,7 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <map>
+#include <atomic>
 #include "threadsafequeue.hpp"
 
 namespace FileReader {
@@ -49,8 +50,12 @@ private:
     //контейнер для прочитанных из файла строк
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> m_readStrs;
 
+    //флаг "дочитал"
+    std::atomic<bool>                                        &m_readComplete;
+
 public:
-    InputFileReader(std::shared_ptr<Containers::ThreadsafeQueue<std::string>>);
+    InputFileReader(std::shared_ptr<Containers::ThreadsafeQueue<std::string>>,
+                    std::atomic<bool>&);
 
     /*
      * Прочитать входной файл.

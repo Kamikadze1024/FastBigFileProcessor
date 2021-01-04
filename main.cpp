@@ -2,11 +2,19 @@
 #include <memory>
 #include <thread>
 #include <future>
+#include <atomic>
 #include "inputfilereader.hpp"
 #include "task.hpp"
 #include "threadpool.hpp"
 
 using namespace std;
+
+/*
+ * Флаг, говорящий потоку парсинга о том, что
+ * новых строк не будет, и можно завершать работу
+ * когда обработает все имеющиеся в буфере строки
+ */
+std::atomic<bool> canStopParsing;
 
 //поток чтения входного файла
 void readerThdFunc(std::shared_ptr<FileReader::InputFileReader> reader) {
@@ -29,6 +37,9 @@ void parserThdFunc(std::shared_ptr<Task::Task> task) {
 }
 
 int main() {
+    //поток парсинга останавливать нельзя
+    canStopParsing.store(false);
+
     //умный указатель на потокобезопасную очередь строк
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings;
     strings.reset(new Containers::ThreadsafeQueue<std::string>);
@@ -44,24 +55,20 @@ int main() {
     //инициализирую объект читателя
     //"Читатель" строк
     std::shared_ptr<FileReader::InputFileReader> ifr;
-    ifr.reset(new FileReader::InputFileReader(strings));
+    ifr.reset(new FileReader::InputFileReader(strings, canStopParsing));
 
     //инициализирую объект - обработчик задач
     std::shared_ptr<Task::Task> taskProc;
-    taskProc.reset(new Task::Task(summs, strings));
+    taskProc.reset(new Task::Task(summs, strings, canStopParsing));
 
+    //пул потоков
     ThPool::ThreadPool thdPool;
 
     //читаю входной файл
     thdPool.submit(std::bind(readerThdFunc, ifr));
-    std::thread parserThread(parserThdFunc, taskProc);
+    thdPool.submit(std::bind(parserThdFunc, taskProc));
 
-    //указать парсеру, что он может завершиться, когда закончит парсить
-    taskProc->canStop();
-    //дождаться окончания парсинга
-    parserThread.join();
-
-
+    //дождаться окончания парсинга и выдать результат
     std::cout << "========= Результат работы ========" << std::endl;
     std::cout << "Сумма расстояний направления 1 = "
         << summs->at("1") <<std::endl;

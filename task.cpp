@@ -4,8 +4,9 @@
 namespace Task {
 
 Task::Task(std::shared_ptr<std::map<std::string, double>> summs,
-           std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings)
-    : m_summs(summs), m_strings(strings) {
+           std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings,
+           std::atomic<bool> &needStop)
+    : m_flagCanStop(needStop), m_summs(summs), m_strings(strings) {
     m_flag.store(true);
     m_flagCanStop.store(false);
 }
@@ -48,11 +49,6 @@ void Task::parseJson(std::string jsonMsg) {
 
     m_summs.get()->at(direction) = m_summs.get()->at(direction)
             + distance;
-}
-
-//указать этому потоку, что может завершаться
-void Task::canStop() {
-    m_flagCanStop.store(true);
 }
 
 void Task::processAllTasks() {

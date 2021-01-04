@@ -35,13 +35,13 @@ public:
 class Task {
 private:
     //флаг работы
-    std::atomic<bool>                                        m_flag;
+    std::atomic<bool>                                         m_flag;
 
     //флаг необходимости остановиться
-    std::atomic<bool>                                        m_flagCanStop;
+    std::atomic<bool>                                        &m_flagCanStop;
 
     //контейнер для сумм расстояний по направлениям
-    std::shared_ptr<std::map<std::string, double>>           m_summs;
+    std::shared_ptr<std::map<std::string, double>>            m_summs;
 
     //потокобезопасная очередь
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> m_strings;
@@ -54,13 +54,11 @@ private:
                   std::string field);
 public:
     Task(std::shared_ptr<std::map<std::string, double>>,
-         std::shared_ptr<Containers::ThreadsafeQueue<std::string>>);
+         std::shared_ptr<Containers::ThreadsafeQueue<std::string>>,
+         std::atomic<bool> &);
 
     //обработать все заявки
     void processAllTasks();
-
-    //указать этому потоку, что может завершаться
-    void canStop();
 };
 
 }
