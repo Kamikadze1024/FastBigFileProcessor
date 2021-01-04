@@ -161,7 +161,7 @@ public:
          * И добавляю их в пул потоков
          */
         try {
-            for(unsigned int i = 0; i < thdCnt; i++) {
+            for(int i = 0; i < thdCnt; i++) {
                 m_threads.push_back(
                             std::thread(&ThreadPool::workerThread, this));
             }
