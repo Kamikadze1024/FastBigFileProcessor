@@ -64,16 +64,10 @@ int main() {
     //пул потоков
     ThPool::ThreadPool thdPool;
 
+    //запускаю поток парсинга
+    thdPool.submit(std::bind(parserThdFunc, taskProc));
     //читаю входной файл
     thdPool.submit(std::bind(readerThdFunc, ifr));
-    thdPool.submit(std::bind(parserThdFunc, taskProc));
-
-    //дождаться окончания парсинга и выдать результат
-    std::cout << "========= Результат работы ========" << std::endl;
-    std::cout << "Сумма расстояний направления 1 = "
-        << summs->at("1") <<std::endl;
-    std::cout << "Сумма расстояний направления -1 = "
-        << summs->at("-1") <<std::endl;
 
     return 0;
 }
