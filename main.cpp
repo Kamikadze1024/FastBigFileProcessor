@@ -36,7 +36,33 @@ void parserThdFunc(std::shared_ptr<Task::Task> task) {
     }
 }
 
+class Foo {
+private:
+    std::string m_msg;
+
+public:
+    Foo(std::string msg) : m_msg(msg) {}
+
+    void operator()() {
+        std::cout << m_msg << std::endl;
+    }
+};
+
 int main() {
+    ThPool::ThreadPool thdPool1;
+
+    Foo foo1("First");
+    Foo foo2("Second");
+
+    auto a1 = thdPool1.submit(foo1);
+    auto a2 = thdPool1.submit(foo2);
+
+    a1.get();
+    a2.get();
+
+
+    return 0;
+
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
 
