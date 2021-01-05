@@ -79,6 +79,9 @@ public:
 
     //обработать все заявки
     void processAllTasks();
+
+    //немедленно остановить поток
+    void stopThread();
 };
 
 }

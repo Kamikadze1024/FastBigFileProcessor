@@ -53,6 +53,9 @@ private:
     //флаг "дочитал"
     std::atomic<bool>                                        &m_readComplete;
 
+    //флаг необходимости остановиться
+    std::atomic<bool>                                         m_needStop;
+
 public:
     InputFileReader(std::shared_ptr<Containers::ThreadsafeQueue<std::string>>,
                     std::atomic<bool>&);
@@ -64,6 +67,9 @@ public:
      * файла - вернет исключение.
      */
     void readInputFile();
+
+    //немедленно остановить поток
+    void stopThread();
 };
 
 }

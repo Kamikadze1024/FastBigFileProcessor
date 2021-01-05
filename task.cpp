@@ -12,7 +12,6 @@ Task::Task(std::shared_ptr<std::map<std::string, double>> summs,
       m_strings(strings),
       m_thdPool(thdPool) {
     m_flag.store(true);
-    m_flagCanStop.store(false);
     m_futuresCntr = 0;
 }
 
@@ -30,6 +29,11 @@ Task::~Task() {
             }
         }
     }
+}
+
+//немедленно остановить поток
+void Task::stopThread() {
+    m_flag.store(false);
 }
 
 std::string Task::getFieldValue(boost::property_tree::ptree const& pt,

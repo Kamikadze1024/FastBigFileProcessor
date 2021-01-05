@@ -16,23 +16,29 @@ using namespace std;
 std::atomic<bool> canStopParsing;
 
 //поток чтения входного файла
-void readerThdFunc(std::shared_ptr<FileReader::InputFileReader> reader) {
+int readerThdFunc(std::shared_ptr<FileReader::InputFileReader> reader) {
     try {
         reader->readInputFile();
     } catch (FileReader::FileReaderException &e) {
         std::cout << e.what() << std::endl;
-        return;
+        reader->stopThread();
+        //останавливаю поток парсинга, чтобы не работал вхолостую
+        canStopParsing.store(true);
+        return false;
     }
+    return true;
 }
 
 //поток парсинга и подсчета расстояния
-void parserThdFunc(std::shared_ptr<Task::Task> task) {
+int parserThdFunc(std::shared_ptr<Task::Task> task) {
     try {
         task->processAllTasks();
     } catch (Task::JsonParsingException &e) {
         std::cout << e.what() << std::endl;
-        return;
+        task->stopThread();
+        return false;
     }
+    return true;
 }
 
 int main() {
@@ -74,8 +80,13 @@ int main() {
     auto readFut = thdPool->submit(std::bind(readerThdFunc, ifr));
 
     //по-факту, дождаться окончания выполнения задач
-    readFut.get();
-    parseFut.get();
+    bool readRes  = readFut.get();
+    bool parseRes = parseFut.get();
+
+    if(!(readRes && parseRes)) {
+        std::cout << "Ошибка времени выполнения" << std::endl;
+        return -1;
+    }
 
     //дождаться окончания парсинга и выдать результат
     std::cout << "========= Результат работы ========" << std::endl;

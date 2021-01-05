@@ -6,7 +6,14 @@ namespace FileReader {
 InputFileReader::InputFileReader(std::shared_ptr<
                                  Containers::ThreadsafeQueue<std::string>
                                  > strs, std::atomic<bool> &readComplete)
-    : m_readStrs(strs), m_readComplete(readComplete) { }
+    : m_readStrs(strs), m_readComplete(readComplete) {
+    m_needStop.store(false);
+}
+
+//немедленно остановить поток
+void InputFileReader::stopThread() {
+    m_needStop.store(true);
+}
 
 //прочитать входной файл
 void InputFileReader::readInputFile() {
@@ -42,6 +49,11 @@ void InputFileReader::readInputFile() {
         std::size_t strCntr = 0;
         for(boost::uintmax_t i = 0; i < size; i++) {
 
+            //нужно завершить работу
+            if(m_needStop.load()) {
+                break;
+            }
+
             //считываю блок
             memcpy(arr, (pStartPoint + i), CONST_BLK_SZ);
             i += CONST_BLK_SZ;
@@ -52,7 +64,7 @@ void InputFileReader::readInputFile() {
                 //если встретил конец строки, перешел на следующую строку
                 if(*(pStartPoint + j) == '\n') {
                     std::string res = arr;
-                    std::cout << res << std::endl;
+                    //std::cout << res << std::endl;
                     //опускаю строку в очередь
                     m_readStrs->push(res);
 
