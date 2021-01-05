@@ -15,7 +15,10 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <map>
 #include <atomic>
+#include <vector>
+#include <memory>
 #include "threadsafequeue.hpp"
+#include "threadpool.hpp"
 
 namespace Task {
 
@@ -46,16 +49,33 @@ private:
     //потокобезопасная очередь
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> m_strings;
 
+    //указатель на пул потоков
+    std::shared_ptr<ThPool::ThreadPool>                       m_thdPool;
+
+    //счетчик обработанных futures
+    unsigned int                                              m_futuresCntr;
+
     //распарсить json
     void parseJson(std::string jsonMsg);
 
     //получить значение поля
     std::string getFieldValue(boost::property_tree::ptree const& pt,
                   std::string field);
+
+    //вектор фьючерсов
+    std::vector<std::future<std::pair<std::string, double>>> m_futuresVect;
+
+    //задача из строки получить пару: направление; дистанция
+    std::pair<std::string, double> calculateDistance(
+            std::string &jsonStr);
+
 public:
     Task(std::shared_ptr<std::map<std::string, double>>,
          std::shared_ptr<Containers::ThreadsafeQueue<std::string>>,
-         std::atomic<bool> &);
+         std::atomic<bool> &,
+         std::shared_ptr<ThPool::ThreadPool>);
+
+    ~Task();
 
     //обработать все заявки
     void processAllTasks();

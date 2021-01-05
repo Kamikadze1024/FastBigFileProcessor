@@ -5,7 +5,6 @@
 #include <atomic>
 #include "inputfilereader.hpp"
 #include "task.hpp"
-#include "threadpool.hpp"
 
 using namespace std;
 
@@ -36,35 +35,13 @@ void parserThdFunc(std::shared_ptr<Task::Task> task) {
     }
 }
 
-class Foo {
-private:
-    std::string m_msg;
-
-public:
-    Foo(std::string msg) : m_msg(msg) {}
-
-    void operator()() {
-        std::cout << m_msg << std::endl;
-    }
-};
-
 int main() {
-    ThPool::ThreadPool thdPool1;
-
-    Foo foo1("First");
-    Foo foo2("Second");
-
-    auto a1 = thdPool1.submit(foo1);
-    auto a2 = thdPool1.submit(foo2);
-
-    a1.get();
-    a2.get();
-
-
-    return 0;
-
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
+
+    //пул потоков
+    std::shared_ptr<ThPool::ThreadPool> thdPool;
+    thdPool.reset(new ThPool::ThreadPool());
 
     //умный указатель на потокобезопасную очередь строк
     std::shared_ptr<Containers::ThreadsafeQueue<std::string>> strings;
@@ -81,19 +58,20 @@ int main() {
     //инициализирую объект читателя
     //"Читатель" строк
     std::shared_ptr<FileReader::InputFileReader> ifr;
-    ifr.reset(new FileReader::InputFileReader(strings, canStopParsing));
+    ifr.reset(new FileReader::InputFileReader(strings,
+                                              canStopParsing));
 
     //инициализирую объект - обработчик задач
     std::shared_ptr<Task::Task> taskProc;
-    taskProc.reset(new Task::Task(summs, strings, canStopParsing));
-
-    //пул потоков
-    ThPool::ThreadPool thdPool;
+    taskProc.reset(new Task::Task(summs,
+                                  strings,
+                                  canStopParsing,
+                                  thdPool));
 
     //запускаю поток парсинга
-    auto parseFut = thdPool.submit(std::bind(parserThdFunc, taskProc));
+    auto parseFut = thdPool->submit(std::bind(parserThdFunc, taskProc));
     //читаю входной файл
-    auto readFut = thdPool.submit(std::bind(readerThdFunc, ifr));
+    auto readFut = thdPool->submit(std::bind(readerThdFunc, ifr));
 
     //по-факту, дождаться окончания выполнения задач
     readFut.get();
