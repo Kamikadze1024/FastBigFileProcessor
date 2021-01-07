@@ -44,7 +44,22 @@ int parserThdFunc(std::shared_ptr<Task::Task> task) {
 
 int main() {
     //генерация тестового файла
+    FileGenerator::TestFileGenerator tfg;
 
+    //указатель на статистику файла
+    std::shared_ptr<std::map<std::string, double>> crFileStat;
+    crFileStat = nullptr;
+    try {
+        crFileStat = tfg.createTestFile();
+    } catch (FileGenerator::TestFileGeneratorExc &e) {
+        std::cout << e.what() << std::endl;
+    }
+
+    if(crFileStat == nullptr) {
+        std::cout << "Некорректная генерация" << std::endl;
+    }
+
+    return 0;
 
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
