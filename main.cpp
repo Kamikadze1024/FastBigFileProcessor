@@ -3,6 +3,7 @@
 #include <thread>
 #include <future>
 #include <atomic>
+#include <chrono>
 #include "inputfilereader.hpp"
 #include "task.hpp"
 #include "testfilegenerator.hpp"
@@ -43,7 +44,6 @@ int parserThdFunc(std::shared_ptr<Task::Task> task) {
 }
 
 int main(int argc, char *argv[]) {
-
     //простенький разбор аргументов командной строки
     if(argc > 1) {
         std::string readArg(argv[1]);
@@ -76,6 +76,10 @@ int main(int argc, char *argv[]) {
             return 0;
         }
     }
+
+    //замеряю время выполнения.
+    //отметка "сейчас"
+    auto t0 = std::chrono::system_clock::now();
 
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
@@ -123,8 +127,14 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    //отметка "после выполнения"
+    auto t1 = std::chrono::system_clock::now();
+    //разница во времени между "началом" и "концом"
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(t1 - t0);
+
     //дождаться окончания парсинга и выдать результат
     std::cout << "========= Результат работы ========" << std::endl;
+    std::cout << "Потрачено времени " << elapsed.count() << " s" << std::endl;
     std::cout << "Сумма расстояний направления 1 = "
         << summs->at("1") <<std::endl;
     std::cout << "Сумма расстояний направления -1 = "

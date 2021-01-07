@@ -33,7 +33,7 @@ private:
     //путь к файлу
     const std::string CONST_TEST_FILE_PATH  = "./";
     //имя файла
-    const std::string CONST_TEST_FILE_NAME  = "test_file2.txt";
+    const std::string CONST_TEST_FILE_NAME  = "testDataFile.txt";
     //размер тестового файла в строках
     const unsigned int CONST_TEST_FILE_SIZE = 2000000;
 
