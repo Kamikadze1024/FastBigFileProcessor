@@ -5,6 +5,7 @@
 #include <atomic>
 #include "inputfilereader.hpp"
 #include "task.hpp"
+#include "testfilegenerator.hpp"
 
 using namespace std;
 
@@ -42,6 +43,9 @@ int parserThdFunc(std::shared_ptr<Task::Task> task) {
 }
 
 int main() {
+    //генерация тестового файла
+
+
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
 
