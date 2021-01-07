@@ -18,9 +18,9 @@ void InputFileReader::stopThread() {
 //прочитать входной файл
 void InputFileReader::readInputFile() {
     //проверяю путь на доступность
-    BfsPath p("shortTestData.txt");
+    BfsPath p("testDataFile.txt");
     if(!boost::filesystem::exists(p)) {
-        throw FileReaderException("Файл shortTestData.txt недоступен");
+        throw FileReaderException("Файл testDataFile.txt недоступен");
     }
 
     //получаю размер файла в байтах

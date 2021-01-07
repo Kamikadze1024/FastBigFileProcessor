@@ -3,8 +3,10 @@
 #include <thread>
 #include <future>
 #include <atomic>
+#include <chrono>
 #include "inputfilereader.hpp"
 #include "task.hpp"
+#include "testfilegenerator.hpp"
 
 using namespace std;
 
@@ -41,7 +43,44 @@ int parserThdFunc(std::shared_ptr<Task::Task> task) {
     return true;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    //простенький разбор аргументов командной строки
+    if(argc > 1) {
+        std::string readArg(argv[1]);
+        if(readArg == "generate") {
+            /*
+             * Сбрасываю время для корректной генерации
+             * случайных чисел.
+             */
+            std::srand(time(nullptr));
+
+            //генерация тестового файла
+            FileGenerator::TestFileGenerator tfg;
+
+            //указатель на статистику файла
+            std::shared_ptr<std::map<std::string, float>> crFileStat;
+            crFileStat = nullptr;
+            try {
+                crFileStat = tfg.createTestFile();
+            } catch (FileGenerator::TestFileGeneratorExc &e) {
+                std::cout << e.what() << std::endl;
+            }
+
+            if(crFileStat == nullptr) {
+                std::cout << "Некорректная генерация" << std::endl;
+            }
+
+            std::cout << "1 : " << crFileStat->at("1") << std::endl;
+            std::cout << "-1 : " << crFileStat->at("-1") << std::endl;
+
+            return 0;
+        }
+    }
+
+    //замеряю время выполнения.
+    //отметка "сейчас"
+    auto t0 = std::chrono::system_clock::now();
+
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
 
@@ -88,8 +127,14 @@ int main() {
         return -1;
     }
 
+    //отметка "после выполнения"
+    auto t1 = std::chrono::system_clock::now();
+    //разница во времени между "началом" и "концом"
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(t1 - t0);
+
     //дождаться окончания парсинга и выдать результат
     std::cout << "========= Результат работы ========" << std::endl;
+    std::cout << "Потрачено времени " << elapsed.count() << " s" << std::endl;
     std::cout << "Сумма расстояний направления 1 = "
         << summs->at("1") <<std::endl;
     std::cout << "Сумма расстояний направления -1 = "
