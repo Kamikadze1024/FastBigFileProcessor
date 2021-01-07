@@ -54,7 +54,7 @@ int main() {
     FileGenerator::TestFileGenerator tfg;
 
     //указатель на статистику файла
-    std::shared_ptr<std::map<std::string, double>> crFileStat;
+    std::shared_ptr<std::map<std::string, float>> crFileStat;
     crFileStat = nullptr;
     try {
         crFileStat = tfg.createTestFile();

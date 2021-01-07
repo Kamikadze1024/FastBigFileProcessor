@@ -10,6 +10,8 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace FileGenerator {
 
@@ -33,14 +35,20 @@ private:
     //имя файла
     const std::string CONST_TEST_FILE_NAME  = "test_file2.txt";
     //размер тестового файла в строках
-    const unsigned int CONST_TEST_FILE_SIZE = 2000000;
+    const unsigned int CONST_TEST_FILE_SIZE = 3;
+
+    //паттерн первой части строки
+    std::string        m_firstPartStringPattern;
 
     /*
      * Умный указатель на пары direction, сумма.
      * Нужен для того, чтобы знать суммы по направлениям
      * в сгенерированном файле
      */
-    std::shared_ptr<std::map<std::string, double>> m_dirSumm;
+    std::shared_ptr<std::map<std::string, float>> m_dirSumm;
+
+    //вектор строк для записи
+    std::vector<std::string>                        m_generatedStrings;
 
     //генерация набора строк с конкретным направлением и к-вом
     void generateStringsPack(std::string &direction, unsigned int cnt);
@@ -51,12 +59,23 @@ private:
     //запись набора строк в файл
     void writeGeneratedStrings();
 
+    /*
+     * Сгенерировать число из диапазона [l;r]
+     * с точностью в 2 знака после зпт.
+     */
+    float genFloatRandNum2(float l, float r);
+
+    /*
+     * Сгенерировать число из диапазона [l;r]
+     * с точностью в 4 знака после зпт.
+     */
+    float genFloatRandNum4(float l, float r);
 public:
     TestFileGenerator();
     ~TestFileGenerator();
 
     //единственный интерфейсный метод генерации тест. файла
-    std::shared_ptr<std::map<std::string, double>> createTestFile();
+    std::shared_ptr<std::map<std::string, float>> createTestFile();
 
     //правило трех
     TestFileGenerator(TestFileGenerator &) = delete;
