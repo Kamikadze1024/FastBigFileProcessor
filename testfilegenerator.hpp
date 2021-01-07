@@ -35,7 +35,7 @@ private:
     //имя файла
     const std::string CONST_TEST_FILE_NAME  = "test_file2.txt";
     //размер тестового файла в строках
-    const unsigned int CONST_TEST_FILE_SIZE = 3;
+    const unsigned int CONST_TEST_FILE_SIZE = 2000000;
 
     //паттерн первой части строки
     std::string        m_firstPartStringPattern;
@@ -48,7 +48,7 @@ private:
     std::shared_ptr<std::map<std::string, float>> m_dirSumm;
 
     //вектор строк для записи
-    std::vector<std::string>                        m_generatedStrings;
+    std::vector<std::string>                      m_generatedStrings;
 
     //генерация набора строк с конкретным направлением и к-вом
     void generateStringsPack(std::string &direction, unsigned int cnt);

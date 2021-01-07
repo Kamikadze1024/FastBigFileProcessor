@@ -42,31 +42,40 @@ int parserThdFunc(std::shared_ptr<Task::Task> task) {
     return true;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 
-    /*
-     * Сбрасываю время для корректной генерации
-     * случайных чисел.
-     */
-    std::srand(time(nullptr));
+    //простенький разбор аргументов командной строки
+    if(argc > 1) {
+        std::string readArg(argv[1]);
+        if(readArg == "generate") {
+            /*
+             * Сбрасываю время для корректной генерации
+             * случайных чисел.
+             */
+            std::srand(time(nullptr));
 
-    //генерация тестового файла
-    FileGenerator::TestFileGenerator tfg;
+            //генерация тестового файла
+            FileGenerator::TestFileGenerator tfg;
 
-    //указатель на статистику файла
-    std::shared_ptr<std::map<std::string, float>> crFileStat;
-    crFileStat = nullptr;
-    try {
-        crFileStat = tfg.createTestFile();
-    } catch (FileGenerator::TestFileGeneratorExc &e) {
-        std::cout << e.what() << std::endl;
+            //указатель на статистику файла
+            std::shared_ptr<std::map<std::string, float>> crFileStat;
+            crFileStat = nullptr;
+            try {
+                crFileStat = tfg.createTestFile();
+            } catch (FileGenerator::TestFileGeneratorExc &e) {
+                std::cout << e.what() << std::endl;
+            }
+
+            if(crFileStat == nullptr) {
+                std::cout << "Некорректная генерация" << std::endl;
+            }
+
+            std::cout << "1 : " << crFileStat->at("1") << std::endl;
+            std::cout << "-1 : " << crFileStat->at("-1") << std::endl;
+
+            return 0;
+        }
     }
-
-    if(crFileStat == nullptr) {
-        std::cout << "Некорректная генерация" << std::endl;
-    }
-
-    return 0;
 
     //поток парсинга останавливать нельзя
     canStopParsing.store(false);
