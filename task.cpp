@@ -146,6 +146,7 @@ void Task::processAllTasks() {
 
         //не завершать поток раньше чем все суммы будут подсчитаны
         if((m_flagCanStop.load()) && (m_futuresCntr >= m_futuresVect.size())) {
+            std::cout << "m_futuresCntr = " << m_futuresCntr << std::endl;
             m_flag.store(false);
         }
     }
