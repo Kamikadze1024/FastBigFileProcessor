@@ -43,6 +43,13 @@ int parserThdFunc(std::shared_ptr<Task::Task> task) {
 }
 
 int main() {
+
+    /*
+     * Сбрасываю время для корректной генерации
+     * случайных чисел.
+     */
+    std::srand(time(nullptr));
+
     //генерация тестового файла
     FileGenerator::TestFileGenerator tfg;
 

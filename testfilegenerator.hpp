@@ -29,12 +29,27 @@ private:
      * Константы
      */
     //путь к файлу
-    const std::string CONST_TEST_FILE_PATH = "./";
+    const std::string CONST_TEST_FILE_PATH  = "./";
     //имя файла
-    const std::string CONST_TEST_FILE_NAME = "test_file2.txt";
+    const std::string CONST_TEST_FILE_NAME  = "test_file2.txt";
     //размер тестового файла в строках
-    const unsigned long int CONST_TEST_FILE_SIZE = 2000000;
+    const unsigned int CONST_TEST_FILE_SIZE = 2000000;
 
+    /*
+     * Умный указатель на пары direction, сумма.
+     * Нужен для того, чтобы знать суммы по направлениям
+     * в сгенерированном файле
+     */
+    std::shared_ptr<std::map<std::string, double>> m_dirSumm;
+
+    //генерация набора строк с конкретным направлением и к-вом
+    void generateStringsPack(std::string &direction, unsigned int cnt);
+
+    //генерация набора строк
+    void generateStrings();
+
+    //запись набора строк в файл
+    void writeGeneratedStrings();
 
 public:
     TestFileGenerator();
