@@ -1,4 +1,4 @@
-#include "inputfilereader.hpp"
+#include "../include/inputfilereader.hpp"
 #include <iostream>
 
 namespace FileReader {

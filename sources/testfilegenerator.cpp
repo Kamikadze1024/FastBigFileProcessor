@@ -1,7 +1,8 @@
-#include "testfilegenerator.hpp"
+#include "../include/testfilegenerator.hpp"
 #include <boost/filesystem.hpp>
 #include <sstream>
 #include <iomanip>
+#include <fstream>
 
 namespace FileGenerator {
 

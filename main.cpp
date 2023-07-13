@@ -4,9 +4,9 @@
 #include <future>
 #include <atomic>
 #include <chrono>
-#include "inputfilereader.hpp"
-#include "task.hpp"
-#include "testfilegenerator.hpp"
+#include "include/inputfilereader.hpp"
+#include "include/task.hpp"
+#include "include/testfilegenerator.hpp"
 
 using namespace std;
 
